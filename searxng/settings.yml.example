@@ -1,0 +1,13 @@
+# searxng/settings.yml
+use_default_settings: true
+server:
+  secret_key: "ultrasecretkey"  # change this!
+  limiter: false                # disable rate limiter for local usage
+  image_proxy: true
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json
+    - csv
+    - rss
