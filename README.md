@@ -58,13 +58,13 @@ To use this tool in other specific projects or global editors, you need to regis
     {
       "mcpServers": {
         "web-search": {
-          "command": "uvx",
-          "args": [
-            "web-search-mcp"
-          ],
-          "env": {
-            "SEARXNG_BASE_URL": "http://localhost:8080"
-          }
+            "command": "uvx",
+            "args": [
+                "--from", "web-search-searxng-mcp", "web-search-mcp"
+            ],
+            "env": {
+                "SEARXNG_BASE_URL": "http://localhost:8080"
+            }
         }
       }
     }
