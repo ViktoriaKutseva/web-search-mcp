@@ -1,0 +1,3 @@
+"""
+Web Search MCP Package.
+"""
