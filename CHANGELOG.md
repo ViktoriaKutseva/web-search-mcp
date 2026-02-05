@@ -16,6 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - None yet
 
+## [0.1.1] - 2026-02-05
+
+### Fixed
+- Config: set case_sensitive to False in model_config
+- Update command args for web-search configuration
+- Build: configure hatchling to find web_search_mcp package
+- Build: rename package to web-search-searxng-mcp
+
+### Documentation
+- Update README and settings example for clarity
+
 ## [0.1.0] - 2026-02-05
 
 ### Added
