@@ -1,5 +1,5 @@
 [project]
-name = "web-search-mcp"
+name = "web-search-searxng-mcp"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"

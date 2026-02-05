@@ -7,7 +7,7 @@ This project uses [UV](https://docs.astral.sh/uv/) as the package manager and Gi
 1. **PyPI Account**: Create an account at [https://pypi.org/](https://pypi.org/)
 2. **Trusted Publishing**: Configure trusted publishing (no API tokens needed!) at [https://pypi.org/manage/account/publishing/](https://pypi.org/manage/account/publishing/)
    - Add a new publisher with:
-     - PyPI Project Name: `web-search-mcp`
+     - PyPI Project Name: `web-search-searxng-mcp`
      - Owner: `ViktoriaKutseva`
      - Repository name: `web-search-mcp`
      - Workflow name: `publish-to-pypi.yml`
