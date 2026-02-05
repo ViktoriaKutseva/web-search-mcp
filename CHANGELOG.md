@@ -16,5 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - None yet
 
+## [0.1.0] - 2026-02-05
+
+### Added
+- Initial project release with web search capabilities
+- MCP server implementation
+- SearXNG integration
+- Documentation and configuration setup
+
 [Unreleased]: https://github.com/ViktoriaKutseva/web-search-mcp/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/ViktoriaKutseva/web-search-mcp/releases/tag/v0.1.0
