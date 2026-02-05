@@ -10,19 +10,14 @@ Before starting, ensure you have the following installed:
 2.  **uv**: An extremely fast Python package installer and resolver.
     - Install instructions: [astral.sh/uv](https://github.com/astral-sh/uv)
 
-## Step 1: Installation & Setup
+## Step 1: Prepare Local SearxNG
+
+You need the configuration files from this repository to run the local search engine instance that the MCP server will connect to.
 
 1.  **Clone the Repository**
-    Clone this repository to a permanent location on your machine.
     ```bash
     git clone https://github.com/ViktoriaKutseva/web-search-mcp.git
     cd web-search-mcp
-    ```
-
-2.  **Initialize Environment**
-    Use `uv` to sync dependencies (this creates the virtual environment).
-    ```bash
-    uv sync
     ```
 
 ## Step 2: Start the Search Engine
@@ -51,27 +46,20 @@ To use this tool in other specific projects or global editors, you need to regis
 
 ### Option A: Integration with Claude Desktop
 
-1.  **Get Absolute Path**
-    Run `pwd` (Linux/macOS) or `cd` (Windows) in the repository root to get the full path.
-    *Example:* `/home/user/code/web-search-mcp`
-
-2.  **Locate Config File**
+1.  **Locate Config File**
     Find or create the `claude_desktop_config.json` file:
     *   **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
     *   **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-3.  **Edit Configuration**
-    Add the `web-search` entry to the `mcpServers` object. Replace `/ABSOLUTE/PATH/TO/` with your actual path.
+2.  **Edit Configuration**
+    Add the `web-search` entry to the `mcpServers` object.
 
     ```json
     {
       "mcpServers": {
         "web-search": {
-          "command": "uv",
+          "command": "uvx",
           "args": [
-            "--directory",
-            "/ABSOLUTE/PATH/TO/web-search-mcp",
-            "run",
             "web-search-mcp"
           ],
           "env": {
@@ -82,7 +70,7 @@ To use this tool in other specific projects or global editors, you need to regis
     }
     ```
 
-4.  **Restart Claude Desktop**
+3.  **Restart Claude Desktop**
     Completely quit and restart the application for changes to take effect.
 
 ## Step 4: Verification
@@ -95,7 +83,7 @@ To use this tool in other specific projects or global editors, you need to regis
 ## Troubleshooting
 
 -   **SearxNG not reachable**: Ensure Docker container is running (`docker ps`) and port 8080 is free.
--   **MCP Error**: Check the logs in your client or run `uv run web-search-mcp` manually in the terminal to see if it starts without crashing (it will wait for stdio input).
+-   **MCP Error**: Check the logs in your client or run `uvx web-search-mcp` manually in the terminal to see if it starts without crashing (it will wait for stdio input).
 
 ## Configuration
 
