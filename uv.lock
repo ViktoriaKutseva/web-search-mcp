@@ -1279,8 +1279,8 @@ wheels = [
 ]
 
 [[package]]
-name = "web-search-mcp"
-version = "0.1.0"
+name = "web-search-searxng-mcp"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "fastmcp" },
