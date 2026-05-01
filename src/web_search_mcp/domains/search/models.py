@@ -17,3 +17,4 @@ class SearchResponse(BaseModel):
     query: str = Field(..., description="The original search query")
     results: List[SearchResult] = Field(default_factory=list, description="List of search results")
     number_of_results: int = Field(0, description="Total number of results returned")
+    error: Optional[str] = Field(None, description="Optional error message when search provider fails")

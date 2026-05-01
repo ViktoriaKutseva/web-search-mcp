@@ -1,6 +1,8 @@
 from fastmcp import FastMCP
 from web_search_mcp.infrastructure.clients.searxng import SearxNGClient
 from web_search_mcp.domains.search.services import SearchService
+from web_search_mcp.domains.search.models import SearchResponse
+from web_search_mcp.domains.search.exceptions import SearchProviderError
 from web_search_mcp.config.logging import configure_logging
 
 # Configure logging at module level or startup
@@ -27,5 +29,14 @@ def web_search(query: str, limit: int = 10) -> str:
         A JSON string containing the search results.
     """
     service = get_search_service()
-    response = service.perform_search(query, limit)
+    try:
+        response = service.perform_search(query, limit)
+    except SearchProviderError as e:
+        response = SearchResponse(
+            query=query,
+            results=[],
+            number_of_results=0,
+            error=str(e)
+        )
+
     return response.model_dump_json(indent=2)

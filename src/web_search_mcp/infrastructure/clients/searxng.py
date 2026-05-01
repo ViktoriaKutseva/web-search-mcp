@@ -17,34 +17,80 @@ class SearxNGClient:
         """
         Perform a search query against SearxNG.
         """
-        url = f"{self.base_url}/search"
-        params: Dict[str, Any] = {
-            "q": query,
+        clean_query = query.strip()
+        if not clean_query:
+            return []
+
+        if limit <= 0:
+            return []
+
+        # Keep request defaults conservative because instance-specific params can trigger upstream errors.
+        primary_params: Dict[str, Any] = {
+            "q": clean_query,
             "format": "json",
             "categories": "general",
             "language": "en-US",
             "pageno": 1,
         }
-        
-        # SearxNG doesn't strictly support 'limit' in params usually, it returns results per page.
-        # We can implement client-side slicing or try using 'time_range' etc if needed.
-        # But 'limit' isn't a standard param in all searxng instances, usually controlled by preferences.
-        # We will slice the result.
+        fallback_params: Dict[str, Any] = {
+            "q": clean_query,
+            "format": "json",
+        }
+
+        data = self._request_json_with_fallback(primary_params, fallback_params)
+        return self._parse_results(data, limit)
+
+    def _request_json_with_fallback(self, primary_params: Dict[str, Any], fallback_params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Try a primary request first, retry once on 5xx, then fallback to minimal params.
+        """
+        url = f"{self.base_url}/search"
 
         try:
-            logger.debug(f"Requesting {url} with params {params}")
-            with httpx.Client(timeout=self.timeout) as client:
-                response = client.get(url, params=params)
-                response.raise_for_status()
-                data = response.json()
-        except httpx.HTTPError as e:
-            logger.error(f"HTTP error communicating with SearxNG: {e}")
-            raise SearchProviderError(f"SearxNG communication error: {e}")
-        except Exception as e:
-            logger.error(f"Unexpected error communicating with SearxNG: {e}")
-            raise SearchProviderError(f"SearxNG unexpected error: {e}")
+            return self._request_json_with_retry(url, primary_params)
+        except SearchProviderError as primary_error:
+            logger.warning(f"Primary SearxNG request failed, retrying with fallback params: {primary_error}")
+            try:
+                return self._request_json_with_retry(url, fallback_params)
+            except SearchProviderError as fallback_error:
+                raise SearchProviderError(
+                    f"SearxNG request failed after fallback. Primary: {primary_error}. Fallback: {fallback_error}"
+                )
 
-        return self._parse_results(data, limit)
+    def _request_json_with_retry(self, url: str, params: Dict[str, Any], attempts: int = 2) -> Dict[str, Any]:
+        """
+        Perform request and retry transient server failures (HTTP 5xx).
+        """
+        last_error: Exception | None = None
+
+        for attempt in range(1, attempts + 1):
+            try:
+                logger.debug(f"Requesting {url} with params {params} (attempt {attempt}/{attempts})")
+                with httpx.Client(timeout=self.timeout) as client:
+                    response = client.get(url, params=params)
+                    response.raise_for_status()
+                    return response.json()
+            except httpx.HTTPStatusError as e:
+                status_code = e.response.status_code
+                if 500 <= status_code < 600 and attempt < attempts:
+                    logger.warning(
+                        f"Transient SearxNG HTTP {status_code} on attempt {attempt}; retrying request."
+                    )
+                    last_error = e
+                    continue
+                raise SearchProviderError(f"HTTP error from SearxNG: {status_code}")
+            except httpx.HTTPError as e:
+                if attempt < attempts:
+                    logger.warning(f"SearxNG transport error on attempt {attempt}; retrying. Error: {e}")
+                    last_error = e
+                    continue
+                raise SearchProviderError(f"SearxNG communication error: {e}")
+            except ValueError as e:
+                raise SearchProviderError(f"Invalid JSON response from SearxNG: {e}")
+            except Exception as e:
+                raise SearchProviderError(f"SearxNG unexpected error: {e}")
+
+        raise SearchProviderError(f"SearxNG request failed after retries: {last_error}")
 
     def _parse_results(self, data: Dict[str, Any], limit: int) -> List[SearchResult]:
         """
